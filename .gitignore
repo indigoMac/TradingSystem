@@ -1,0 +1,83 @@
+# Build Folders
+**/bin/
+**/obj/
+**/TestResults/
+**/*.dll
+**/*.pdb
+**/*.cache
+**/*.log
+**/*.vspscc
+**/*.vssscc
+
+# Visual Studio files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Rider
+.idea/
+*.sln.iml
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# User-specific files
+*.userprefs
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# IIS Express
+/.vs/*
+
+# DotCover
+*.dotCover
+
+# Rider caches
+.idea/
+*.sln.iml
+
+# Azure Pipelines
+.azure-pipelines.yml
+
+# Resharper
+_ReSharper*
+*.DotSettings.user
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Node modules (if any node tooling appears)
+node_modules/
+
+# Misc
+*.db
+*.db-shm
+*.db-wal
+
+# Environment files
+*.env
+
+# Ignore publish output
+**/publish/
+
+# Ignore package output folders
+**/out/
+
+# Ignore local app settings
+**/appsettings.Development.json
