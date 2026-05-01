@@ -10,12 +10,13 @@ namespace TradingSystem.Worker.RiskMonitor;
 
 public sealed class RiskMonitorConsumer
 {
+    private readonly ILogger<RiskMonitorConsumer> _logger;
     private readonly IMarketDataChannel _marketDataChannel;
     private readonly IOrderIntentChannel _orderIntentChannel;
-    // private String RiskDecision = "";
 
-    public RiskMonitorConsumer(IMarketDataChannel marketDataChannel, IOrderIntentChannel orderIntentChannel)
+    public RiskMonitorConsumer(ILogger<RiskMonitorConsumer> logger, IMarketDataChannel marketDataChannel, IOrderIntentChannel orderIntentChannel)
     {
+        _logger = logger;
         _marketDataChannel = marketDataChannel;
         _orderIntentChannel = orderIntentChannel;
     }
@@ -24,8 +25,7 @@ public sealed class RiskMonitorConsumer
     {
         await foreach (var tick in _marketDataChannel.Reader.ReadAllAsync(cancellationToken))
         {
-            var RiskDecision = await AnalyseRisk(tick, cancellationToken);
-            Console.WriteLine($"Tick: {tick.Symbol} Price: {tick.Price} Time: {tick.TimeStamp} Order: {RiskDecision}");
+            await AnalyseRisk(tick, cancellationToken);
             await Task.Delay(250, cancellationToken);
         }
     }
@@ -41,9 +41,15 @@ public sealed class RiskMonitorConsumer
             Quantity: quantity
         );
 
+        _logger.LogInformation("[RISK] {ID} {side} {symbol} {price} {quantity}",
+        orderIntent.ID,
+        orderIntent.Side,
+        orderIntent.Symbol,
+        orderIntent.Price,
+        orderIntent.Quantity);
+
         await _orderIntentChannel.Writer.WriteAsync(orderIntent, cancellationToken);
 
-        Console.WriteLine($"{orderIntent.ID}: {orderIntent.Side} {orderIntent.Quantity} or {orderIntent.Symbol} at {orderIntent.Price} per share at time {orderIntent.TimeStamp}");
         await Task.Delay(250, cancellationToken);
     }
 

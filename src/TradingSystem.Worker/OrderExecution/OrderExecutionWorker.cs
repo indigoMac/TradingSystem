@@ -1,23 +1,32 @@
 using TradingSystem.Worker.RiskMonitor;
 using TradingSystem.Domain.Entities;
 using TradingSystem.Application.interfaces;
+using System.Collections.Concurrent;
 
 namespace TradingSystem.Worker.OrderExecution;
 
 public sealed class OrderExecusion
 {
     private readonly IOrderIntentChannel _orderIntentChannel;
+    private readonly ILogger<OrderExecusion> _logger;
 
-    public OrderExecusion(IOrderIntentChannel orderIntentChannel)
+    public OrderExecusion(ILogger<OrderExecusion> logger, IOrderIntentChannel orderIntentChannel)
     {
+        _logger = logger;
         _orderIntentChannel = orderIntentChannel;
     }
 
     public async Task ConsumeAsync(CancellationToken cancellationToken)
     {
-        await foreach (var OrderIntent in _orderIntentChannel.Reader.ReadAllAsync(cancellationToken))
+        await foreach (var orderIntent in _orderIntentChannel.Reader.ReadAllAsync(cancellationToken))
         {
-            Console.WriteLine($"[EXECUTED] {OrderIntent.ID}: A {OrderIntent.Side} Order Executed for {OrderIntent.Quantity} of {OrderIntent.Symbol} at {OrderIntent.Price} on {OrderIntent.TimeStamp}");
+            _logger.LogInformation("[EXECUTED] {ID} {Side} {Symbol} {Price} {Quantity} {Time}",
+            orderIntent.ID,
+            orderIntent.Side,
+            orderIntent.Symbol,
+            orderIntent.Price,
+            orderIntent.Quantity,
+            orderIntent.TimeStamp);
             await Task.Delay(250, cancellationToken);
         }
     }
