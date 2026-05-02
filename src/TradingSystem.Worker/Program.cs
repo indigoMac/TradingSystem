@@ -5,6 +5,8 @@ using TradingSystem.Worker.MarketData;
 using TradingSystem.Worker.RiskMonitor;
 using TradingSystem.Worker;
 using TradingSystem.Worker.OrderExecution;
+using TradingSystem.Infrastructure.Metrics;
+using TradingSystem.Worker.Mertrics;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -20,6 +22,8 @@ builder.Services.AddSingleton<IOrderIntentChannel, OrderIntentChannel>();
 builder.Services.AddSingleton<FakeMarketDataProducer>();
 builder.Services.AddSingleton<RiskMonitorConsumer>();
 builder.Services.AddSingleton<OrderExecusion>();
+builder.Services.AddSingleton<ITradingMetrics, TradingMetrics>();
+builder.Services.AddSingleton<MetricsReporter>();
 
 builder.Services.AddHostedService<Worker>();
 

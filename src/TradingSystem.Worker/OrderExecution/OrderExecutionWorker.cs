@@ -9,10 +9,14 @@ public sealed class OrderExecusion
 {
     private readonly IOrderIntentChannel _orderIntentChannel;
     private readonly ILogger<OrderExecusion> _logger;
+    private readonly ITradingMetrics _tradingMetrics;
 
-    public OrderExecusion(ILogger<OrderExecusion> logger, IOrderIntentChannel orderIntentChannel)
+    public OrderExecusion(ILogger<OrderExecusion> logger, 
+        ITradingMetrics tradingMetrics,
+        IOrderIntentChannel orderIntentChannel)
     {
         _logger = logger;
+        _tradingMetrics = tradingMetrics;
         _orderIntentChannel = orderIntentChannel;
     }
 
@@ -27,6 +31,7 @@ public sealed class OrderExecusion
             orderIntent.Price,
             orderIntent.Quantity,
             orderIntent.TimeStamp);
+            _tradingMetrics.IncrementExecuted();
             await Task.Delay(250, cancellationToken);
         }
     }

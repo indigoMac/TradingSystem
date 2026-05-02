@@ -13,20 +13,31 @@ public sealed class RiskMonitorConsumer
     private readonly ILogger<RiskMonitorConsumer> _logger;
     private readonly IMarketDataChannel _marketDataChannel;
     private readonly IOrderIntentChannel _orderIntentChannel;
+    private readonly ITradingMetrics _tradingMetrics;
 
-    public RiskMonitorConsumer(ILogger<RiskMonitorConsumer> logger, IMarketDataChannel marketDataChannel, IOrderIntentChannel orderIntentChannel)
+    public RiskMonitorConsumer(ILogger<RiskMonitorConsumer> logger,
+        ITradingMetrics tradingMetrics,
+        IMarketDataChannel marketDataChannel, 
+        IOrderIntentChannel orderIntentChannel)
     {
         _logger = logger;
+        _tradingMetrics = tradingMetrics;
         _marketDataChannel = marketDataChannel;
         _orderIntentChannel = orderIntentChannel;
     }
 
-    public async Task ConsumeAsync(CancellationToken cancellationToken)
+    public async Task ConsumeAsync(int workerId, CancellationToken cancellationToken)
     {
         await foreach (var tick in _marketDataChannel.Reader.ReadAllAsync(cancellationToken))
         {
+            _logger.LogInformation(
+                "[RISK-{WorkerId}] Processing tick {TickId} {Symbol} {Price}",
+                workerId,
+                tick.ID,
+                tick.Symbol,
+                tick.Price);
             await AnalyseRisk(tick, cancellationToken);
-            await Task.Delay(250, cancellationToken);
+            await Task.Delay(1000, cancellationToken);
         }
     }
 
@@ -48,6 +59,8 @@ public sealed class RiskMonitorConsumer
         orderIntent.Price,
         orderIntent.Quantity);
 
+        _tradingMetrics.IncrementRisked();
+        
         await _orderIntentChannel.Writer.WriteAsync(orderIntent, cancellationToken);
 
         await Task.Delay(250, cancellationToken);
