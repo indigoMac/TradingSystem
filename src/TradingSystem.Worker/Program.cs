@@ -6,7 +6,7 @@ using TradingSystem.Worker.RiskMonitor;
 using TradingSystem.Worker;
 using TradingSystem.Worker.OrderExecution;
 using TradingSystem.Infrastructure.Metrics;
-using TradingSystem.Worker.Mertrics;
+using TradingSystem.Worker.Metrics;
 
 var builder = Host.CreateApplicationBuilder(args);
 

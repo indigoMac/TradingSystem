@@ -6,5 +6,7 @@ public sealed record OrderIntent(
     decimal Price,
     DateTime TimeStamp,
     string Side,
-    int Quantity
+    int Quantity,
+    DateTime TickCreatedAt,
+    Guid SourceTickId
 );

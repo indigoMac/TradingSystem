@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 using TradingSystem.Application.interfaces;
 using TradingSystem.Infrastructure.Metrics;
 
-namespace TradingSystem.Worker.Mertrics;
+namespace TradingSystem.Worker.Metrics;
 
 public sealed class MetricsReporter
 {
@@ -24,6 +24,12 @@ public sealed class MetricsReporter
                 _metrics.Produced,
                 _metrics.Risked,
                 _metrics.Executed);
+
+            _logger.LogInformation(
+                "[LATENCY METRICS] Risk={riskLatency} Executted={executedLatency} E2E={e2eLatency}",
+                _metrics.AverageRiskLatencyMs,
+                _metrics.AverageExecutedLatencyMs,
+                _metrics.AverageEndToEndLatencyMs);
 
             await Task.Delay(1000, cancellationToken);
         }

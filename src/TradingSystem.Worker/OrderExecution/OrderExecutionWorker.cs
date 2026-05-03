@@ -24,6 +24,17 @@ public sealed class OrderExecusion
     {
         await foreach (var orderIntent in _orderIntentChannel.Reader.ReadAllAsync(cancellationToken))
         {
+            var now = DateTime.UtcNow;
+
+            var executionLatencyMs =
+                (now - orderIntent.TimeStamp).TotalMilliseconds;
+
+            var endToEndLatencyMs =
+                (now - orderIntent.TickCreatedAt).TotalMilliseconds;
+
+            _tradingMetrics.RecordExecutionLatency(executionLatencyMs);
+            _tradingMetrics.RecordEndToEndLatency(endToEndLatencyMs);
+
             _logger.LogInformation("[EXECUTED] {ID} {Side} {Symbol} {Price} {Quantity} {Time}",
             orderIntent.ID,
             orderIntent.Side,

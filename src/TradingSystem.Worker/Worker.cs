@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using TradingSystem.Worker.MarketData;
 using TradingSystem.Worker.OrderExecution;
 using TradingSystem.Worker.RiskMonitor;
-using TradingSystem.Worker.Mertrics;
+using TradingSystem.Worker.Metrics;
 
 namespace TradingSystem.Worker;
 

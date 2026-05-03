@@ -30,6 +30,9 @@ public sealed class RiskMonitorConsumer
     {
         await foreach (var tick in _marketDataChannel.Reader.ReadAllAsync(cancellationToken))
         {
+            var riskLatencyMs = (DateTime.UtcNow - tick.TimeStamp).TotalMilliseconds;
+            _tradingMetrics.RecordRiskLatency(riskLatencyMs);
+
             _logger.LogInformation(
                 "[RISK-{WorkerId}] Processing tick {TickId} {Symbol} {Price}",
                 workerId,
@@ -47,9 +50,11 @@ public sealed class RiskMonitorConsumer
             ID: Guid.NewGuid(),
             Symbol: tick.Symbol,
             Price: tick.Price,
-            TimeStamp: tick.TimeStamp,
+            TimeStamp: DateTime.UtcNow,
             Side: side,
-            Quantity: quantity
+            Quantity: quantity,
+            TickCreatedAt: tick.TimeStamp,
+            SourceTickId: tick.ID
         );
 
         _logger.LogInformation("[RISK] {ID} {side} {symbol} {price} {quantity}",
@@ -60,7 +65,7 @@ public sealed class RiskMonitorConsumer
         orderIntent.Quantity);
 
         _tradingMetrics.IncrementRisked();
-        
+
         await _orderIntentChannel.Writer.WriteAsync(orderIntent, cancellationToken);
 
         await Task.Delay(250, cancellationToken);
